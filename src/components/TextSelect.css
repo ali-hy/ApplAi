@@ -1,0 +1,32 @@
+.text-select {
+	@apply relative;
+}
+
+.ai-form .text-select {
+	@apply flex-1;
+	@apply ms-4;
+}
+
+.options-list-container {
+	@apply mt-1 rounded-md h-fit w-full overflow-hidden absolute
+	z-10;
+}
+
+.options-list {
+	@apply w-full  max-h-52 overflow-auto;
+}
+
+.options-list li {
+	@apply block cursor-pointer
+	/* bg */
+	bg-slate-800 hover:bg-slate-900
+	/* size */
+	w-full px-2 py-1
+	/* rounding */
+	rounded-none;
+	pointer-events: auto;
+}
+
+.options-list li.current {
+	@apply bg-white text-neutral-900;
+}
