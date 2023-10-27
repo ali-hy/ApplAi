@@ -30,20 +30,6 @@ h2 {
 	@apply md:p-5;
 }
 
-.ai-form {
-	@apply border-[#aaa] border-solid border-2 rounded-lg p-5;
-}
-
-.ai-form > div {
-	@apply mb-3;
-	@apply flex;
-	@apply items-center;
-}
-
-.text-select input {
-	@apply w-full;
-}
-
 button,
 button[type="submit"] {
 	@apply bg-sky-700;
@@ -51,4 +37,15 @@ button[type="submit"] {
 	@apply rounded-md;
 	@apply py-2;
 	@apply px-3;
+}
+
+::-webkit-scrollbar {
+	width: 14px;
+	background: inherit;
+	background-color: inherit;
+}
+
+::-webkit-scrollbar-thumb {
+	@apply border-transparent border-4 border-solid 
+	bg-clip-padding bg-neutral-500 rounded-3xl;
 }

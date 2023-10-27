@@ -44,22 +44,26 @@ export default function TextSelect(props: TextSelectProps) {
 		if (options) formik.setFieldValue(field, options[currentOption]);
 	};
 
+	const showOptions =
+		fieldFocused &&
+		options &&
+		!options
+			?.map((s) => s.toLowerCase())
+			?.includes(
+				(formik.values as Record<string, string>)[props.name].toLowerCase()
+			);
+
 	const keyDownReducer =
 		(field: string) => (e: SyntheticEvent<HTMLInputElement, KeyboardEvent>) => {
-			console.log(e);
 			switch (e.nativeEvent.key.toLowerCase()) {
 				case "enter":
-					console.log("doing enter stuff");
 					e.preventDefault();
-					console.log(
-						e.nativeEvent.target?.dispatchEvent(
-							new KeyboardEvent("keydown", { bubbles: true, key: "Tab" })
-						)
+					e.nativeEvent.target?.dispatchEvent(
+						new KeyboardEvent("keydown", { bubbles: true, key: "Tab" })
 					);
 					break;
 				case "tab":
-					if (options) {
-						console.log("doing tab stuff");
+					if (showOptions) {
 						setValueToOption(field);
 					}
 					break;
@@ -83,83 +87,90 @@ export default function TextSelect(props: TextSelectProps) {
 		const value = (formik.values as Record<string, string>)[props.name];
 		setOptions(
 			props.options.filter((option: string) =>
-				option.toLowerCase().includes(value.toLowerCase())
+				option.toLowerCase().startsWith(value.toLowerCase())
 			)
 		);
 	}, [(formik.values as Record<string, string>)[props.name]]);
 
-	const validateType = (value: unknown) => {
-		switch (props.type) {
-			case "number":
-				return isNaN(value as number) ? "expected a number" : undefined;
-			default:
-				return undefined;
+	const validateRange = (value: unknown) => {
+		if (props.type !== "number") {
+			console.log("not validating range cuz not number");
+			return;
+		}
+
+		const n = value as number;
+		if (props.max !== undefined && n > props.max) {
+			return `Out of range. (maximum = ${props.max})`;
+		} else if (props.min !== undefined && n < props.min) {
+			return `Out of range. (minimum = ${props.min})`;
 		}
 	};
 
 	const validateOptions = (value: unknown) => {
 		if (props.options) {
-			return props.options.includes(value as string)
+			return !props.options
+				.map((option) => option.toLowerCase())
+				.includes((value as string).toLowerCase())
 				? "not an available option"
 				: undefined;
 		}
 	};
 
 	const validate = (value: string) => {
-		return (
-			validateType(value) &&
-			validateOptions(value) &&
-			props.validate &&
-			props.validate(value)
-		);
+		const errors =
+			validateRange(value) ||
+			validateOptions(value) ||
+			(props.validate && props.validate(value));
+		// console.log("errors: ", errors);
+		return errors;
 	};
 
-	const showOptions =
-		fieldFocused &&
-		options &&
-		!options
-			?.map((s) => s.toLowerCase())
-			?.includes(
-				(formik.values as Record<string, string>)[props.name].toLowerCase()
-			);
-
 	return (
-		<div className="text-select">
-			<Field
-				className={"px-2 py-1 rounded-md " + props.className}
-				validate={validate}
-				name={props.name}
-				type={props.type}
-				min={props.min ?? 0}
-				max={props.max}
-				onKeyDown={keyDownReducer(props.name)}
-				onFocus={() => {
-					setFieldFocused(true);
-				}}
-				onBlur={() => {
-					setTimeout(setFieldFocused, 200, false);
-				}}
-			/>
-			<ErrorMessage name={props.name} />
-			{showOptions && (
-				<div className="options-list-container">
-					<ul ref={optionsListRef} className="options-list">
-						{options.map((option, i) => (
-							<li
-								key={option}
-								className={`${currentOption == i ? "current" : ""}`}
-								onClick={() => {
-									formik.setFieldValue(props.name, option);
-									setFieldFocused(false);
-								}}
-								ref={currentOption === i ? currentOptionLi : undefined}
-							>
-								{option}
-							</li>
-						))}
-					</ul>
-				</div>
-			)}
-		</div>
+		<>
+			<label className="py-1">{props.name}</label>
+			<div className="text-select">
+				<Field
+					className={"px-2 py-1 rounded-md " + props.className}
+					validate={validate}
+					name={props.name}
+					type={props.type}
+					min={props.min ?? 0}
+					max={props.max}
+					onKeyDown={keyDownReducer(props.name)}
+					onFocus={() => {
+						setFieldFocused(true);
+						formik.handleChange(props.name);
+					}}
+					onBlur={(e: SyntheticEvent) => {
+						setTimeout(setFieldFocused, 200, false);
+						formik.handleBlur(props.name)(e);
+					}}
+				/>
+				<ErrorMessage
+					className=" text-sm text-red-400"
+					component={"p"}
+					name={props.name}
+				/>
+				{showOptions && (
+					<div className="options-list-container">
+						<ul ref={optionsListRef} className="options-list">
+							{options.map((option, i) => (
+								<li
+									key={option}
+									className={`${currentOption == i ? "current" : ""}`}
+									onClick={() => {
+										formik.setFieldValue(props.name, option);
+										setFieldFocused(false);
+									}}
+									ref={currentOption === i ? currentOptionLi : undefined}
+								>
+									{option}
+								</li>
+							))}
+						</ul>
+					</div>
+				)}
+			</div>
+		</>
 	);
 }

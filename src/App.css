@@ -1,0 +1,18 @@
+.ai-form {
+	@apply w-full h-full
+	/* flex */
+	flex flex-col
+	/* order */
+	order-2 md:order-1 
+	/* border */
+	border-[#aaa] border-solid border-2 rounded-lg p-5;
+}
+
+.ai-form .fields-container {
+	@apply overflow-auto mb-3;
+}
+
+.ai-form > div > div {
+	@apply mb-3;
+	@apply flex;
+}

@@ -1,10 +1,10 @@
 import axios from "axios"
 
 export interface SalaryClassifierInput {
-  age: string,
-  education_num: string,
-  capital_gain: string,
-  capital_loss: string,
+  age: number,
+  education_num: number,
+  capital_gain: number,
+  capital_loss: number,
   hours_per_week: string,
   country: string,
   gender: string,

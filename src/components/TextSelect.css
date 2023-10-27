@@ -2,6 +2,10 @@
 	@apply relative;
 }
 
+.text-select input {
+	@apply w-full;
+}
+
 .ai-form .text-select {
 	@apply flex-1;
 	@apply ms-4;
